@@ -30,8 +30,9 @@ services:
       S1DS_RUNTIME: mono
       FORCE_STEAMCMD_UPDATE: "false"
       RESET_STEAMCMD: "false"
-      HOME: /home/container
-      WINEPREFIX: /home/container/.wine
+      STEAM_ROOT: /home/container/steam
+      HOME: /home/container/steam
+      WINEPREFIX: /home/container/steam/wineprefix
       SERVER_NAME: "${SERVER_NAME:-Schedule I Dedicated Server}"
       MAX_PLAYERS: "${MAX_PLAYERS:-16}"
       SERVER_PASSWORD: "${SERVER_PASSWORD:-}"
