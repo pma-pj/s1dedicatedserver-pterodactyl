@@ -8,27 +8,22 @@ export STEAM_ROOT="${STEAM_ROOT:-/home/container/steam}"
 export HOME="$STEAM_ROOT"
 export WINEPREFIX="${WINEPREFIX:-$STEAM_ROOT/wineprefix}"
 
-export STEAMCMD_DIR="$STEAM_ROOT/steamcmd"
-export STEAMWORKS_REDIST_DIR="$STEAM_ROOT/steamworks_redist"
+export STEAMCMD_DIR="${STEAMCMD_DIR:-$STEAM_ROOT/steamcmd}"
+export STEAMWORKS_REDIST_DIR="${STEAMWORKS_REDIST_DIR:-$STEAM_ROOT/steamworks_redist}"
+
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$STEAM_ROOT/.local/share}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$STEAM_ROOT/.config}"
 
 mkdir -p /home/container
 mkdir -p "$STEAM_ROOT"
 mkdir -p "$STEAMCMD_DIR"
 mkdir -p "$STEAMWORKS_REDIST_DIR"
-mkdir -p "$STEAM_ROOT/Steam"
+mkdir -p "$STEAM_ROOT/Steam/logs"
+mkdir -p "$STEAM_ROOT/Steam/package"
 mkdir -p "$STEAM_ROOT/.steam"
-mkdir -p "$STEAM_ROOT/.local/share"
-mkdir -p "$STEAM_ROOT/.config"
+mkdir -p "$XDG_DATA_HOME"
+mkdir -p "$XDG_CONFIG_HOME"
 mkdir -p "$WINEPREFIX"
-
-if [ ! -f "$STEAMCMD_DIR/steamcmd.sh" ]; then
-  echo "Copying SteamCMD to writable directory: $STEAMCMD_DIR"
-  cp -a /home/steam/steamcmd/. "$STEAMCMD_DIR/"
-fi
-
-chmod +x "$STEAMCMD_DIR/steamcmd.sh" || true
-chmod +x "$STEAMCMD_DIR/linux32/steamcmd" || true
-chmod +x "$STEAMCMD_DIR/linux64/steamcmd" || true
 
 cd /home/container
 
