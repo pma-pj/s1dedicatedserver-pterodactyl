@@ -25,16 +25,17 @@ RUN python3 /tmp/patch_run.py \
     && sed -i 's|/home/steam/steamcmd/steamcmd.sh|/usr/local/bin/pterodactyl-steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
     && sed -i 's|/home/container/steamcmd/steamcmd.sh|/usr/local/bin/pterodactyl-steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
     && sed -i 's|/home/container/steam/steamcmd/steamcmd.sh|/usr/local/bin/pterodactyl-steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
-    && sed -i 's|./steamcmd.sh|/usr/local/bin/pterodactyl-steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
+    && sed -i 's|\./steamcmd\.sh|/usr/local/bin/pterodactyl-steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
     && sed -i 's|/home/steam/steamworks_redist|/home/container/steam/steamworks_redist|g' /usr/local/bin/s1ds-run.sh \
     && sed -i 's|/home/container/steamworks_redist|/home/container/steam/steamworks_redist|g' /usr/local/bin/s1ds-run.sh \
     && chmod 0755 /usr/local/bin/s1ds-run.sh \
     && chmod 0755 /home \
     && chmod -R a+rX /home/steam \
     && rm /tmp/patch_run.py \
+    && echo "--- patched s1ds-run.sh references ---" \
     && grep -n "steamcmd.sh\|pterodactyl-steamcmd\|steamworks_redist\|1007" /usr/local/bin/s1ds-run.sh \
     && grep -q "/usr/local/bin/pterodactyl-steamcmd.sh" /usr/local/bin/s1ds-run.sh \
-    && ! grep -q "./steamcmd.sh" /usr/local/bin/s1ds-run.sh
+    && ! grep -Fq './steamcmd.sh' /usr/local/bin/s1ds-run.sh
 
 WORKDIR /home/container
 
