@@ -1,0 +1,5 @@
+.env
+steam.env
+data/
+*.log
+*.zip

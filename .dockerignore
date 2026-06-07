@@ -1,0 +1,8 @@
+.git
+.github
+.env
+steam.env
+data
+*.log
+*.zip
+README.local.md

@@ -1,15 +1,17 @@
 # Schedule I / S1DedicatedServers for Pterodactyl
 
-This repository contains an optional wrapper image for the ifBars/S1DedicatedServers Docker image.
+Pterodactyl/Wings usually starts game containers as an unprivileged UID/GID with a read-only root filesystem. Only `/home/container` is writable and persistent. The upstream S1DedicatedServers image expects runtime state below `/home/steam`, which can fail under Pterodactyl.
 
 Created using AI.
 
-Why this wrapper exists:
+This wrapper image fixes that by:
 
-- S1DS writes to `/home/steam/game` by default.
-- Pterodactyl persists and exposes `/home/container`.
-- This wrapper sets `STEAMAPPDIR=/home/container`.
-- It also patches S1DS `run.sh` so the server receives Pterodactyl-friendly startup flags:
+- forcing `HOME=/home/container`
+- forcing `STEAMAPPDIR=/home/container`
+- forcing `WINEPREFIX=/home/container/.wine`
+- copying SteamCMD into `/home/container/steamcmd`
+- patching the S1DS runner to use `/home/container/steamcmd`
+- adding Pterodactyl-friendly server launch args:
   - `--stdio-console`
   - `-logFile -`
   - `--server-port ${SERVER_PORT}`
@@ -17,29 +19,112 @@ Why this wrapper exists:
   - `--max-players ${MAX_PLAYERS}`
   - optional `--server-password ${SERVER_PASSWORD}`
 
-Build:
+## Build locally
 
 ```bash
-docker build -t ghcr.io/YOUR_GHCR_USER/s1ds-pterodactyl-mono:latest .
-docker push ghcr.io/YOUR_GHCR_USER/s1ds-pterodactyl-mono:latest
+docker build --no-cache -t s1ds-ptero-local:test .
 ```
 
-Then set the egg Docker image to:
+## Local Pterodactyl-like test
 
-```text
-ghcr.io/YOUR_GHCR_USER/s1ds-pterodactyl-mono:latest
+Copy the examples:
+
+```bash
+cp .env.example .env
+cp steam.env.example steam.env
 ```
 
-Use Mono runtime:
+Edit `.env` and `steam.env`.
+
+Important for Steam passwords with special characters: keep the value single-quoted in `steam.env`:
+
+```env
+STEAM_PASS='abc$def#ghi!123'
+```
+
+Build and start debug:
+
+```bash
+docker compose build --no-cache
+docker compose up debug --force-recreate
+```
+
+Start the actual test container:
+
+```bash
+docker compose up s1ds --force-recreate
+```
+
+If SteamCMD asks for Steam Guard, enter the one-time code once. After successful login, clear `STEAM_GUARD` again.
+
+## Push to GHCR
+
+The included GitHub Actions workflow builds and pushes:
 
 ```text
+ghcr.io/<owner>/<repo>:latest
+ghcr.io/<owner>/<repo>:sha-...
+ghcr.io/<owner>/<repo>:vX.Y.Z
+```
+
+For a versioned image:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+## Pterodactyl egg settings
+
+Use your GHCR image, for example:
+
+```text
+ghcr.io/pma-pj/s1dedicatedserver-pterodactyl:v1.0.0
+```
+
+Suggested startup command:
+
+```bash
+bash /usr/local/bin/pterodactyl-entrypoint.sh
+```
+
+The image also has this as its `ENTRYPOINT`, so the startup command can be simple, but do not use an `echo`-only startup command if your egg relies on executing `STARTUP`.
+
+Required/important variables:
+
+```text
+STEAM_USER
+STEAM_PASS
+STEAM_GUARD              temporary only
 S1DS_RUNTIME=mono
 STEAMAPPDIR=/home/container
+SERVER_PORT=38465
+SERVER_NAME=Schedule I Dedicated Server
+MAX_PLAYERS=16
+SERVER_PASSWORD=optional
+FORCE_STEAMCMD_UPDATE=false
+RESET_STEAMCMD=false     set true once if SteamCMD cache is broken
 ```
 
 Ports:
 
-- Primary allocation: server port, default 38465
-- Additional allocation: 27016 UDP for Steam query/listing when using SteamGameServer
+```text
+38465/tcp
+38465/udp
+27016/tcp
+27016/udp
+```
 
-Steam credentials are needed on first boot so SteamCMD can download Schedule I.
+## SteamCMD cache recovery
+
+If SteamCMD gets stuck in a broken bootstrap state, set this Pterodactyl variable once:
+
+```text
+RESET_STEAMCMD=true
+```
+
+Start the server, then set it back to:
+
+```text
+RESET_STEAMCMD=false
+```

@@ -1,0 +1,132 @@
+services:
+  s1ds:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: s1ds-ptero-local:test
+    container_name: s1ds-ptero-local-test
+
+    # Match the UID/GID from your Wings container as closely as possible.
+    user: "${PTERO_UID:-996}:${PTERO_GID:-994}"
+    working_dir: /home/container
+    read_only: true
+
+    tmpfs:
+      - /tmp:rw,exec,nosuid,size=100m
+
+    volumes:
+      - ${PTERO_VOLUME_PATH:-./data}:/home/container
+
+    env_file:
+      - steam.env
+
+    environment:
+      TZ: Europe/Berlin
+      SERVER_IP: 0.0.0.0
+      SERVER_PORT: ${SERVER_PORT:-38465}
+      STEAMAPPID: 3164500
+      STEAMAPPDIR: /home/container
+      STEAM_BRANCH: ""
+      S1DS_RUNTIME: mono
+      FORCE_STEAMCMD_UPDATE: "false"
+      RESET_STEAMCMD: "false"
+      HOME: /home/container
+      WINEPREFIX: /home/container/.wine
+      SERVER_NAME: "${SERVER_NAME:-Schedule I Dedicated Server}"
+      MAX_PLAYERS: "${MAX_PLAYERS:-16}"
+      SERVER_PASSWORD: "${SERVER_PASSWORD:-}"
+
+    ports:
+      - "${HOST_SERVER_PORT:-38465}:38465/tcp"
+      - "${HOST_SERVER_PORT:-38465}:38465/udp"
+      - "${HOST_QUERY_PORT:-27016}:27016/tcp"
+      - "${HOST_QUERY_PORT:-27016}:27016/udp"
+
+    entrypoint:
+      - /bin/bash
+      - /usr/local/bin/pterodactyl-entrypoint.sh
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - AUDIT_WRITE
+      - NET_RAW
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+
+    stdin_open: true
+    tty: true
+
+  debug:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: s1ds-ptero-local:test
+    container_name: s1ds-ptero-debug
+
+    user: "${PTERO_UID:-996}:${PTERO_GID:-994}"
+    working_dir: /home/container
+    read_only: true
+
+    tmpfs:
+      - /tmp:rw,exec,nosuid,size=100m
+
+    volumes:
+      - ${PTERO_VOLUME_PATH:-./data}:/home/container
+
+    env_file:
+      - steam.env
+
+    environment:
+      HOME: /home/container
+      WINEPREFIX: /home/container/.wine
+      STEAMAPPDIR: /home/container
+      STEAMAPPID: 3164500
+      STEAM_BRANCH: ""
+      S1DS_RUNTIME: mono
+      FORCE_STEAMCMD_UPDATE: "false"
+
+    entrypoint:
+      - /bin/bash
+
+    command:
+      - -lc
+      - |
+        id
+        echo "HOME=$$HOME"
+        echo "WINEPREFIX=$$WINEPREFIX"
+        echo "STEAMAPPDIR=$$STEAMAPPDIR"
+        echo
+        env | sort | grep -E 'HOME|WINE|STEAM|S1DS|SERVER' || true
+        echo
+        ls -ld / /home /home/container /usr/local/bin || true
+        ls -la /usr/local/bin/pterodactyl-entrypoint.sh /usr/local/bin/s1ds-run.sh || true
+        echo
+        grep -n '/home/container/steamcmd\|/home/steam/steamcmd\|PTERODACTYL_S1DS_PATCH' /usr/local/bin/s1ds-run.sh || true
+        echo
+        sleep infinity
+
+    security_opt:
+      - no-new-privileges:true
+
+    cap_drop:
+      - SETPCAP
+      - MKNOD
+      - AUDIT_WRITE
+      - NET_RAW
+      - DAC_OVERRIDE
+      - FOWNER
+      - FSETID
+      - NET_BIND_SERVICE
+      - SYS_CHROOT
+      - SETFCAP
+
+    stdin_open: true
+    tty: true

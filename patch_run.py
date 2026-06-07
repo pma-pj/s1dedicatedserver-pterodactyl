@@ -8,9 +8,12 @@ if "PTERODACTYL_S1DS_PATCH" in content:
     raise SystemExit(0)
 
 # Add Pterodactyl-friendly args to the existing Bash array.
+# The upstream S1DS image currently ends SERVER_LAUNCH_ARGS with
+# --steam-gs-anonymous. Keep this conservative so the build fails visibly
+# if upstream changes the runner layout.
 markers = [
     "  --steam-gs-anonymous\n\n)",
-    "  --steam-gs-anonymous\n)"
+    "  --steam-gs-anonymous\n)",
 ]
 
 replacement = """  --steam-gs-anonymous
