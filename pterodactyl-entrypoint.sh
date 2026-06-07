@@ -16,6 +16,7 @@ mkdir -p /home/container/steamcmd
 mkdir -p /home/container/.wine
 mkdir -p /home/container/.local/share
 mkdir -p /home/container/.config
+mkdir -p /home/container/steamworks_redist
 mkdir -p /tmp/.X11-unix 2>/dev/null || true
 chmod 1777 /tmp/.X11-unix 2>/dev/null || true
 

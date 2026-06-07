@@ -21,13 +21,14 @@ ENV S1DS_RUNTIME=mono
 
 RUN python3 /tmp/patch_run.py \
     && install -m 0755 /home/steam/run.sh /usr/local/bin/s1ds-run.sh \
-    && sed -i 's|/home/steam/steamcmd|/home/container/steamcmd|g' /usr/local/bin/s1ds-run.sh \
-    && chmod 0755 /usr/local/bin/s1ds-run.sh /usr/local/bin/pterodactyl-entrypoint.sh \
-    && chmod 0755 /home /home/steam \
+    && sed -i 's|/home/steam/steamcmd/steamcmd.sh|/home/container/steamcmd/steamcmd.sh|g' /usr/local/bin/s1ds-run.sh \
+    && sed -i 's|/home/steam/steamworks_redist|/home/container/steamworks_redist|g' /usr/local/bin/s1ds-run.sh \
+    && chmod 0755 /usr/local/bin/s1ds-run.sh \
+    && chmod 0755 /usr/local/bin/pterodactyl-entrypoint.sh \
+    && chmod 0755 /home \
     && chmod -R a+rX /home/steam \
     && rm /tmp/patch_run.py \
-    && echo "Patched S1DS runner:" \
-    && grep -n "steamcmd\|SERVER_LAUNCH_ARGS\|PTERODACTYL_S1DS_PATCH" /usr/local/bin/s1ds-run.sh | head -80 || true
+    && grep -n "steamcmd.sh\|steamworks_redist\|1007" /usr/local/bin/s1ds-run.sh
 
 WORKDIR /home/container
 
