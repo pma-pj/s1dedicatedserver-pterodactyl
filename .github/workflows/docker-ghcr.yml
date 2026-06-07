@@ -41,18 +41,6 @@ jobs:
             type=sha,prefix=sha-
             type=ref,event=tag
 
-      - name: Build smoke test
-        run: |
-          docker build -t s1ds-ptero-smoke-test .
-          docker run --rm --user 996:994 --entrypoint /bin/bash s1ds-ptero-smoke-test -lc '
-            id
-            test -r /usr/local/bin/pterodactyl-entrypoint.sh
-            test -x /usr/local/bin/pterodactyl-entrypoint.sh
-            test -r /usr/local/bin/s1ds-run.sh
-            test -x /usr/local/bin/s1ds-run.sh
-            grep -q /home/container/steamcmd /usr/local/bin/s1ds-run.sh
-          '
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:

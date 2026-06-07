@@ -19,61 +19,6 @@ This wrapper image fixes that by:
   - `--max-players ${MAX_PLAYERS}`
   - optional `--server-password ${SERVER_PASSWORD}`
 
-## Build locally
-
-```bash
-docker build --no-cache -t s1ds-ptero-local:test .
-```
-
-## Local Pterodactyl-like test
-
-Copy the examples:
-
-```bash
-cp .env.example .env
-cp steam.env.example steam.env
-```
-
-Edit `.env` and `steam.env`.
-
-Important for Steam passwords with special characters: keep the value single-quoted in `steam.env`:
-
-```env
-STEAM_PASS='abc$def#ghi!123'
-```
-
-Build and start debug:
-
-```bash
-docker compose build --no-cache
-docker compose up debug --force-recreate
-```
-
-Start the actual test container:
-
-```bash
-docker compose up s1ds --force-recreate
-```
-
-If SteamCMD asks for Steam Guard, enter the one-time code once. After successful login, clear `STEAM_GUARD` again.
-
-## Push to GHCR
-
-The included GitHub Actions workflow builds and pushes:
-
-```text
-ghcr.io/<owner>/<repo>:latest
-ghcr.io/<owner>/<repo>:sha-...
-ghcr.io/<owner>/<repo>:vX.Y.Z
-```
-
-For a versioned image:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
 ## Pterodactyl egg settings
 
 Use your GHCR image, for example:
@@ -128,3 +73,41 @@ Start the server, then set it back to:
 ```text
 RESET_STEAMCMD=false
 ```
+
+## Build locally
+
+```bash
+docker build --no-cache -t s1ds-ptero-local:test .
+```
+
+## Local Pterodactyl-like test
+
+Copy the examples:
+
+```bash
+cp .env.example .env
+cp steam.env.example steam.env
+```
+
+Edit `.env` and `steam.env`.
+
+Important for Steam passwords with special characters: keep the value single-quoted in `steam.env`:
+
+```env
+STEAM_PASS='abc$def#ghi!123'
+```
+
+Build and start debug:
+
+```bash
+docker compose build --no-cache
+docker compose up debug --force-recreate
+```
+
+Start the actual test container:
+
+```bash
+docker compose up s1ds --force-recreate
+```
+
+If SteamCMD asks for Steam Guard, enter the one-time code once. After successful login, clear `STEAM_GUARD` again.
